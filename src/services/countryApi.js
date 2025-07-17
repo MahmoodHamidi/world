@@ -15,44 +15,458 @@ export const countryService = {
 
     try {
       console.log("Fetching countries from API...");
-      const response = await fetch(
-        `${API_BASE_URL}/all?fields=name,capital,population,area,currencies,languages,flags,cca2,cca3,region,subregion`
-      );
-      
+
+      // Use a working API endpoint
+      const response = await fetch("https://api.first.org/data/v1/countries");
+
       console.log("API Response status:", response.status);
-      
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+        throw new Error(
+          `HTTP error! status: ${response.status} - ${response.statusText}`
+        );
       }
 
       const data = await response.json();
-      console.log("API Response sample:", data[0]); // Debug log
-      const processedData = this.processCountriesData(data);
+      console.log("API Response sample:", data); // Debug log
 
+      // Process the different API format
+      const processedData = this.processFirstOrgApiData(data.data);
       cache.set(cacheKey, processedData);
       return processedData;
     } catch (error) {
       console.error("Error fetching countries:", error);
       console.error("Error details:", error.message);
-      
-      // Fallback: try without fields parameter
-      try {
-        console.log("Trying fallback API call without fields...");
-        const fallbackResponse = await fetch(`${API_BASE_URL}/all`);
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          console.log("Fallback API successful, processing data...");
-          const processedData = this.processCountriesData(fallbackData);
-          cache.set(cacheKey, processedData);
-          return processedData;
-        }
-      } catch (fallbackError) {
-        console.error("Fallback API also failed:", fallbackError);
-      }
-      
-      throw error;
+
+      // Fallback to static data
+      console.log("Using static fallback data...");
+      const staticData = this.getStaticCountriesData();
+      cache.set(cacheKey, staticData);
+      return staticData;
     }
-  }, // Process API data to match our application format
+  },
+
+  // Process API data from first.org
+  processFirstOrgApiData(apiData) {
+    const countries = {};
+
+    Object.entries(apiData).forEach(([code, countryData]) => {
+      const countryName = countryData.country || code;
+      const countryId = countryName.toLowerCase().replace(/\s+/g, "");
+
+      countries[countryId] = {
+        id: countryId,
+        name: {
+          en: countryName,
+          de: this.getGermanName(countryName),
+          fa: this.getPersianName(countryName),
+        },
+        flag: this.getCountryFlagByCode(code),
+        capital: {
+          en: countryData.capital || "Unknown",
+          de: countryData.capital || "Unbekannt",
+          fa: this.getPersianName(countryData.capital) || "نامشخص",
+        },
+        population: "N/A",
+        area: "N/A",
+        currency: "N/A",
+        language: {
+          en: "N/A",
+          de: "N/A",
+          fa: "نامشخص",
+        },
+        description: {
+          en: `${countryName} is a country.`,
+          de: `${countryName} ist ein Land.`,
+          fa: `${this.getPersianName(countryName)} یک کشور است.`,
+        },
+        region: countryData.region || "Unknown",
+        subregion: "Unknown",
+        cities: this.generateMajorCities(countryName),
+      };
+    });
+
+    return countries;
+  },
+
+  // Get static countries data as fallback
+  getStaticCountriesData() {
+    const staticCountries = {
+      iran: {
+        id: "iran",
+        name: {
+          en: "Iran",
+          de: "Iran",
+          fa: "ایران",
+        },
+        flag: "🇮🇷",
+        capital: {
+          en: "Tehran",
+          de: "Teheran",
+          fa: "تهران",
+        },
+        population: "84.0 million",
+        area: "1,648,195 km²",
+        currency: "Iranian Rial (IRR)",
+        language: {
+          en: "Persian (Farsi)",
+          de: "Persisch (Farsi)",
+          fa: "فارسی",
+        },
+        description: {
+          en: "Iran is located in Western Asia.",
+          de: "Iran liegt in Westasien.",
+          fa: "ایران در آسیای غربی قرار دارد.",
+        },
+        region: "Asia",
+        subregion: "Western Asia",
+        cities: [
+          { name: "Tehran", population: "9.1 million" },
+          { name: "Mashhad", population: "3.3 million" },
+          { name: "Isfahan", population: "2.2 million" },
+        ],
+      },
+      germany: {
+        id: "germany",
+        name: {
+          en: "Germany",
+          de: "Deutschland",
+          fa: "آلمان",
+        },
+        flag: "🇩🇪",
+        capital: {
+          en: "Berlin",
+          de: "Berlin",
+          fa: "برلین",
+        },
+        population: "83.2 million",
+        area: "357,114 km²",
+        currency: "Euro (EUR)",
+        language: {
+          en: "German",
+          de: "Deutsch",
+          fa: "آلمانی",
+        },
+        description: {
+          en: "Germany is located in Central Europe.",
+          de: "Deutschland liegt in Mitteleuropa.",
+          fa: "آلمان در اروپای مرکزی قرار دارد.",
+        },
+        region: "Europe",
+        subregion: "Central Europe",
+        cities: [
+          { name: "Berlin", population: "3.7 million" },
+          { name: "Hamburg", population: "1.9 million" },
+          { name: "Munich", population: "1.5 million" },
+        ],
+      },
+      unitedstates: {
+        id: "unitedstates",
+        name: {
+          en: "United States",
+          de: "Vereinigte Staaten",
+          fa: "ایالات متحده",
+        },
+        flag: "🇺🇸",
+        capital: {
+          en: "Washington, D.C.",
+          de: "Washington, D.C.",
+          fa: "واشینگتن",
+        },
+        population: "331.0 million",
+        area: "9,833,517 km²",
+        currency: "US Dollar (USD)",
+        language: {
+          en: "English",
+          de: "Englisch",
+          fa: "انگلیسی",
+        },
+        description: {
+          en: "United States is located in North America.",
+          de: "Die Vereinigten Staaten liegen in Nordamerika.",
+          fa: "ایالات متحده در آمریکای شمالی قرار دارد.",
+        },
+        region: "Americas",
+        subregion: "North America",
+        cities: [
+          { name: "New York", population: "8.3 million" },
+          { name: "Los Angeles", population: "4.0 million" },
+          { name: "Chicago", population: "2.7 million" },
+        ],
+      },
+      france: {
+        id: "france",
+        name: {
+          en: "France",
+          de: "Frankreich",
+          fa: "فرانسه",
+        },
+        flag: "🇫🇷",
+        capital: {
+          en: "Paris",
+          de: "Paris",
+          fa: "پاریس",
+        },
+        population: "67.4 million",
+        area: "643,801 km²",
+        currency: "Euro (EUR)",
+        language: {
+          en: "French",
+          de: "Französisch",
+          fa: "فرانسوی",
+        },
+        description: {
+          en: "France is located in Western Europe.",
+          de: "Frankreich liegt in Westeuropa.",
+          fa: "فرانسه در اروپای غربی قرار دارد.",
+        },
+        region: "Europe",
+        subregion: "Western Europe",
+        cities: [
+          { name: "Paris", population: "2.2 million" },
+          { name: "Marseille", population: "873,000" },
+          { name: "Lyon", population: "518,000" },
+        ],
+      },
+      japan: {
+        id: "japan",
+        name: {
+          en: "Japan",
+          de: "Japan",
+          fa: "ژاپن",
+        },
+        flag: "🇯🇵",
+        capital: {
+          en: "Tokyo",
+          de: "Tokio",
+          fa: "توکیو",
+        },
+        population: "125.8 million",
+        area: "377,975 km²",
+        currency: "Japanese Yen (JPY)",
+        language: {
+          en: "Japanese",
+          de: "Japanisch",
+          fa: "ژاپنی",
+        },
+        description: {
+          en: "Japan is located in East Asia.",
+          de: "Japan liegt in Ostasien.",
+          fa: "ژاپن در آسیای شرقی قرار دارد.",
+        },
+        region: "Asia",
+        subregion: "East Asia",
+        cities: [
+          { name: "Tokyo", population: "14.0 million" },
+          { name: "Yokohama", population: "3.8 million" },
+          { name: "Osaka", population: "2.7 million" },
+        ],
+      },
+    };
+
+    return staticCountries;
+  },
+
+  // Get country flag by country code
+  getCountryFlagByCode(countryCode) {
+    const countryCodeFlags = {
+      IR: "🇮🇷",
+      DE: "🇩🇪",
+      US: "🇺🇸",
+      FR: "🇫🇷",
+      JP: "🇯🇵",
+      AF: "🇦🇫",
+      AL: "🇦🇱",
+      DZ: "🇩🇿",
+      AD: "🇦🇩",
+      AO: "🇦🇴",
+      AG: "🇦🇬",
+      AR: "🇦🇷",
+      AM: "🇦🇲",
+      AU: "🇦🇺",
+      AT: "🇦🇹",
+      AZ: "🇦🇿",
+      BS: "🇧🇸",
+      BH: "🇧🇭",
+      BD: "🇧🇩",
+      BB: "🇧🇧",
+      BY: "🇧🇾",
+      BE: "🇧🇪",
+      BZ: "🇧🇿",
+      BJ: "🇧🇯",
+      BT: "🇧🇹",
+      BO: "🇧🇴",
+      BA: "🇧🇦",
+      BW: "🇧🇼",
+      BR: "🇧🇷",
+      BN: "🇧🇳",
+      BG: "🇧🇬",
+      BF: "🇧🇫",
+      BI: "🇧🇮",
+      KH: "🇰🇭",
+      CM: "🇨🇲",
+      CA: "🇨🇦",
+      CV: "🇨🇻",
+      CF: "🇨🇫",
+      TD: "🇹🇩",
+      CL: "🇨🇱",
+      CN: "🇨🇳",
+      CO: "🇨🇴",
+      KM: "🇰🇲",
+      CG: "🇨🇬",
+      CD: "🇨🇩",
+      CR: "🇨🇷",
+      CI: "🇨🇮",
+      HR: "🇭🇷",
+      CU: "🇨🇺",
+      CY: "🇨🇾",
+      CZ: "🇨🇿",
+      DK: "🇩🇰",
+      DJ: "🇩🇯",
+      DM: "🇩🇲",
+      DO: "🇩🇴",
+      EC: "🇪🇨",
+      EG: "🇪🇬",
+      SV: "🇸🇻",
+      GQ: "🇬🇶",
+      ER: "🇪🇷",
+      EE: "🇪🇪",
+      ET: "🇪🇹",
+      FJ: "🇫🇯",
+      FI: "🇫🇮",
+      GA: "🇬🇦",
+      GM: "🇬🇲",
+      GE: "🇬🇪",
+      GH: "🇬🇭",
+      GR: "🇬🇷",
+      GD: "🇬🇩",
+      GT: "🇬🇹",
+      GN: "🇬🇳",
+      GW: "🇬🇼",
+      GY: "🇬🇾",
+      HT: "🇭🇹",
+      HN: "🇭🇳",
+      HU: "🇭🇺",
+      IS: "🇮🇸",
+      IN: "🇮🇳",
+      ID: "🇮🇩",
+      IQ: "🇮🇶",
+      IE: "🇮🇪",
+      IL: "🇮🇱",
+      IT: "🇮🇹",
+      JM: "🇯🇲",
+      JO: "🇯🇴",
+      KZ: "🇰🇿",
+      KE: "🇰🇪",
+      KI: "🇰🇮",
+      KP: "🇰🇵",
+      KR: "🇰🇷",
+      KW: "🇰🇼",
+      KG: "🇰🇬",
+      LA: "🇱🇦",
+      LV: "🇱🇻",
+      LB: "🇱🇧",
+      LS: "🇱🇸",
+      LR: "🇱🇷",
+      LY: "🇱🇾",
+      LI: "🇱🇮",
+      LT: "🇱🇹",
+      LU: "🇱🇺",
+      MG: "🇲🇬",
+      MW: "🇲🇼",
+      MY: "🇲🇾",
+      MV: "🇲🇻",
+      ML: "🇲🇱",
+      MT: "🇲🇹",
+      MH: "🇲🇭",
+      MR: "🇲🇷",
+      MU: "🇲🇺",
+      MX: "🇲🇽",
+      FM: "🇫🇲",
+      MD: "🇲🇩",
+      MC: "🇲🇨",
+      MN: "🇲🇳",
+      ME: "🇲🇪",
+      MA: "🇲🇦",
+      MZ: "🇲🇿",
+      MM: "🇲🇲",
+      NA: "🇳🇦",
+      NR: "🇳🇷",
+      NP: "🇳🇵",
+      NL: "🇳🇱",
+      NZ: "🇳🇿",
+      NI: "🇳🇮",
+      NE: "🇳🇪",
+      NG: "🇳🇬",
+      NO: "🇳🇴",
+      OM: "🇴🇲",
+      PK: "🇵🇰",
+      PW: "🇵🇼",
+      PA: "🇵🇦",
+      PG: "🇵🇬",
+      PY: "🇵🇾",
+      PE: "🇵🇪",
+      PH: "🇵🇭",
+      PL: "🇵🇱",
+      PT: "🇵🇹",
+      QA: "🇶🇦",
+      RO: "🇷🇴",
+      RU: "🇷🇺",
+      RW: "🇷🇼",
+      KN: "🇰🇳",
+      LC: "🇱🇨",
+      VC: "🇻🇨",
+      WS: "🇼🇸",
+      SM: "🇸🇲",
+      ST: "🇸🇹",
+      SA: "🇸🇦",
+      SN: "🇸🇳",
+      RS: "🇷🇸",
+      SC: "🇸🇨",
+      SL: "🇸🇱",
+      SG: "🇸🇬",
+      SK: "🇸🇰",
+      SI: "🇸🇮",
+      SB: "🇸🇧",
+      SO: "🇸🇴",
+      ZA: "🇿🇦",
+      SS: "🇸🇸",
+      ES: "🇪🇸",
+      LK: "🇱🇰",
+      SD: "🇸🇩",
+      SR: "🇸🇷",
+      SZ: "🇸🇿",
+      SE: "🇸🇪",
+      CH: "🇨🇭",
+      SY: "🇸🇾",
+      TW: "🇹🇼",
+      TJ: "🇹🇯",
+      TZ: "🇹🇿",
+      TH: "🇹🇭",
+      TL: "🇹🇱",
+      TG: "🇹🇬",
+      TO: "🇹🇴",
+      TT: "🇹🇹",
+      TN: "🇹🇳",
+      TR: "🇹🇷",
+      TM: "🇹🇲",
+      TV: "🇹🇻",
+      UG: "🇺🇬",
+      UA: "🇺🇦",
+      AE: "🇦🇪",
+      GB: "🇬🇧",
+      UY: "🇺🇾",
+      UZ: "🇺🇿",
+      VU: "🇻🇺",
+      VE: "🇻🇪",
+      VN: "🇻🇳",
+      YE: "🇾🇪",
+      ZM: "🇿🇲",
+      ZW: "🇿🇼",
+    };
+
+    return countryCodeFlags[countryCode?.toUpperCase()] || "🏴";
+  },
   processCountriesData(apiData) {
     const countries = {};
 
