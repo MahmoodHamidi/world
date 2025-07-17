@@ -28,6 +28,22 @@
   gap: 30px;
 }
 
+/* Flag Image Styling */
+.flag-img {
+  width: 24px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.app.rtl .flag-img {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
 /* General Select Styling */
 select {
   color: #2c3e50 !important;
@@ -133,6 +149,17 @@ select option {
 
 .country-flag {
   font-size: 4rem;
+  line-height: 1;
+  display: inline-block;
+  min-width: 64px;
+  text-align: center;
+}
+
+.country-flag img {
+  width: 64px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 .country-header h2 {

@@ -6,7 +6,13 @@ function CountryInfo({ country, currentLanguage }) {
   return (
     <div className="country-info">
       <div className="country-header">
-        <span className="country-flag">{country.flag}</span>
+        <span className="country-flag">
+          {country.flag && country.flag.startsWith("<img") ? (
+            <span dangerouslySetInnerHTML={{ __html: country.flag }}></span>
+          ) : (
+            country.flag
+          )}
+        </span>
         <h2>{country.name[currentLanguage]}</h2>
       </div>
 
