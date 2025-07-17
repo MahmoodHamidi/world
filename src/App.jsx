@@ -19,22 +19,26 @@ function App() {
 
   // Set document direction for RTL languages and theme
   useEffect(() => {
+    const themeClass = isDarkMode ? "dark-mode" : "light-mode";
+    console.log(
+      "Applying theme:",
+      themeClass,
+      "for language:",
+      currentLanguage
+    );
+
     if (currentLanguage === "fa") {
       document.body.dir = "rtl";
-      document.body.className = `persian-text ${
-        isDarkMode ? "dark-mode" : "light-mode"
-      }`;
+      document.body.className = `persian-text ${themeClass}`;
     } else if (currentLanguage === "de") {
       document.body.dir = "ltr";
-      document.body.className = `german-text ${
-        isDarkMode ? "dark-mode" : "light-mode"
-      }`;
+      document.body.className = `german-text ${themeClass}`;
     } else {
       document.body.dir = "ltr";
-      document.body.className = `english-text ${
-        isDarkMode ? "dark-mode" : "light-mode"
-      }`;
+      document.body.className = `english-text ${themeClass}`;
     }
+
+    console.log("Body className:", document.body.className);
   }, [currentLanguage, isDarkMode]);
 
   // Load saved theme preference
@@ -51,7 +55,14 @@ function App() {
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    const newMode = !isDarkMode;
+    console.log(
+      "Toggling theme from",
+      isDarkMode ? "dark" : "light",
+      "to",
+      newMode ? "dark" : "light"
+    );
+    setIsDarkMode(newMode);
   };
 
   // Fetch countries data from API
@@ -76,7 +87,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
+      <div className="app">
         <LoadingSpinner currentLanguage={currentLanguage} />
       </div>
     );
@@ -84,7 +95,7 @@ function App() {
 
   if (error) {
     return (
-      <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
+      <div className="app">
         <ErrorMessage
           error={error}
           currentLanguage={currentLanguage}
@@ -95,11 +106,7 @@ function App() {
   }
 
   return (
-    <div
-      className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"} ${
-        isDarkMode ? "dark-mode" : "light-mode"
-      }`}
-    >
+    <div className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"}`}>
       <header className="app-header">
         <h1>{translations.countryInfo[currentLanguage]}</h1>
         <div className="header-controls">

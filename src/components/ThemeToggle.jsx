@@ -12,10 +12,18 @@ const ThemeToggle = ({ isDarkMode, onToggle, currentLanguage }) => {
     }
   };
 
+  const handleClick = () => {
+    console.log(
+      "Theme toggle clicked! Current mode:",
+      isDarkMode ? "dark" : "light"
+    );
+    onToggle();
+  };
+
   return (
     <button
       className="theme-toggle"
-      onClick={onToggle}
+      onClick={handleClick}
       aria-label={getToggleText()}
     >
       <span className="theme-icon">{isDarkMode ? "☀️" : "🌙"}</span>
