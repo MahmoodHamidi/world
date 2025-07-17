@@ -1,10 +1,6 @@
-import { countries, translations } from "../data/countries";
+import { translations } from "../data/countries";
 
-function CountrySelector({
-  selectedCountry,
-  onCountryChange,
-  currentLanguage,
-}) {
+function CountrySelector({ selectedCountry, onCountryChange, currentLanguage, countries }) {
   return (
     <div className="country-selector">
       <label htmlFor="country-select">
@@ -12,7 +8,7 @@ function CountrySelector({
       </label>
       <select
         id="country-select"
-        value={selectedCountry || ""}
+        value={selectedCountry || ''}
         onChange={(e) => onCountryChange(e.target.value || null)}
         className="country-select"
       >
