@@ -38,7 +38,7 @@ function App() {
       setCountries(countriesData);
     } catch (err) {
       setError(err.message);
-      console.error('Failed to fetch countries:', err);
+      console.error("Failed to fetch countries:", err);
     } finally {
       setLoading(false);
     }
@@ -60,9 +60,9 @@ function App() {
   if (error) {
     return (
       <div className="app">
-        <ErrorMessage 
-          error={error} 
-          currentLanguage={currentLanguage} 
+        <ErrorMessage
+          error={error}
+          currentLanguage={currentLanguage}
           onRetry={fetchCountries}
         />
       </div>

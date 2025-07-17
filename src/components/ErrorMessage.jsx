@@ -1,20 +1,23 @@
 function ErrorMessage({ error, currentLanguage, onRetry }) {
   const errorMessages = {
     en: {
-      title: 'Error Loading Countries',
-      message: 'Failed to load country data. Please check your internet connection.',
-      retry: 'Try Again'
+      title: "Error Loading Countries",
+      message:
+        "Failed to load country data. Please check your internet connection.",
+      retry: "Try Again",
     },
     de: {
-      title: 'Fehler beim Laden der Länder',
-      message: 'Fehler beim Laden der Länderdaten. Bitte überprüfen Sie Ihre Internetverbindung.',
-      retry: 'Erneut versuchen'
+      title: "Fehler beim Laden der Länder",
+      message:
+        "Fehler beim Laden der Länderdaten. Bitte überprüfen Sie Ihre Internetverbindung.",
+      retry: "Erneut versuchen",
     },
     fa: {
-      title: 'خطا در بارگذاری کشورها',
-      message: 'خطا در بارگذاری اطلاعات کشورها. لطفاً اتصال اینترنت خود را بررسی کنید.',
-      retry: 'تلاش مجدد'
-    }
+      title: "خطا در بارگذاری کشورها",
+      message:
+        "خطا در بارگذاری اطلاعات کشورها. لطفاً اتصال اینترنت خود را بررسی کنید.",
+      retry: "تلاش مجدد",
+    },
   };
 
   const messages = errorMessages[currentLanguage];

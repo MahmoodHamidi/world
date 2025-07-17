@@ -2,9 +2,9 @@ import { translations } from "../data/countries";
 
 function LoadingSpinner({ currentLanguage }) {
   const loadingText = {
-    en: 'Loading countries...',
-    de: 'Länder werden geladen...',
-    fa: 'در حال بارگذاری کشورها...'
+    en: "Loading countries...",
+    de: "Länder werden geladen...",
+    fa: "در حال بارگذاری کشورها...",
   };
 
   return (

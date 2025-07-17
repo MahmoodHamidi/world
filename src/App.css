@@ -28,6 +28,18 @@
   gap: 30px;
 }
 
+/* General Select Styling */
+select {
+  color: #2c3e50 !important;
+  background-color: white !important;
+}
+
+select option {
+  color: #2c3e50 !important;
+  background-color: white !important;
+  padding: 8px !important;
+}
+
 /* Country Selector Styles */
 .country-selector {
   display: flex;
@@ -48,9 +60,16 @@
   border: 2px solid #3498db;
   border-radius: 8px;
   background-color: white;
+  color: #2c3e50;
   min-width: 300px;
   cursor: pointer;
   transition: border-color 0.3s ease;
+}
+
+.country-select option {
+  color: #2c3e50;
+  background-color: white;
+  padding: 8px;
 }
 
 .country-select:focus {
@@ -78,8 +97,15 @@
   border: 2px solid #95a5a6;
   border-radius: 6px;
   background-color: white;
+  color: #2c3e50;
   cursor: pointer;
   transition: border-color 0.3s ease;
+}
+
+.language-select option {
+  color: #2c3e50;
+  background-color: white;
+  padding: 8px;
 }
 
 .language-select:focus {
@@ -242,8 +268,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
