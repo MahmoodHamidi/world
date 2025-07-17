@@ -7,6 +7,7 @@ body {
   margin: 0;
   padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
 }
 
 /* Light Mode Styles */
@@ -16,9 +17,14 @@ body.light-mode {
 }
 
 /* Dark Mode Styles */
-bodybody.dark-mode {
+body.dark-mode {
   background-color: #1a1a1a;
   color: #e0e0e0;
+}
+
+/* Force dark mode colors on all child elements */
+body.dark-mode * {
+  border-color: #555555;
 }
 
 .app {

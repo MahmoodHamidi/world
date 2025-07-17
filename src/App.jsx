@@ -15,7 +15,12 @@ function App() {
   const [countries, setCountries] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Start with light mode
+
+  // Debug: Force dark mode for testing
+  useEffect(() => {
+    console.log("Current isDarkMode state:", isDarkMode);
+  }, [isDarkMode]);
 
   // Set document direction for RTL languages and theme
   useEffect(() => {
@@ -106,7 +111,14 @@ function App() {
   }
 
   return (
-    <div className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"}`}>
+    <div
+      className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"}`}
+      style={{
+        backgroundColor: isDarkMode ? "#1a1a1a" : "#ffffff",
+        color: isDarkMode ? "#e0e0e0" : "#2c3e50",
+        minHeight: "100vh",
+      }}
+    >
       <header className="app-header">
         <h1>{translations.countryInfo[currentLanguage]}</h1>
         <div className="header-controls">
