@@ -7,6 +7,7 @@ import CountryInfo from "./components/CountryInfo";
 import LanguageSelector from "./components/LanguageSelector";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorMessage from "./components/ErrorMessage";
+import ThemeToggle from "./components/ThemeToggle";
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState(null);
@@ -14,20 +15,44 @@ function App() {
   const [countries, setCountries] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Set document direction for RTL languages
+  // Set document direction for RTL languages and theme
   useEffect(() => {
     if (currentLanguage === "fa") {
       document.body.dir = "rtl";
-      document.body.className = "persian-text";
+      document.body.className = `persian-text ${
+        isDarkMode ? "dark-mode" : "light-mode"
+      }`;
     } else if (currentLanguage === "de") {
       document.body.dir = "ltr";
-      document.body.className = "german-text";
+      document.body.className = `german-text ${
+        isDarkMode ? "dark-mode" : "light-mode"
+      }`;
     } else {
       document.body.dir = "ltr";
-      document.body.className = "english-text";
+      document.body.className = `english-text ${
+        isDarkMode ? "dark-mode" : "light-mode"
+      }`;
     }
-  }, [currentLanguage]);
+  }, [currentLanguage, isDarkMode]);
+
+  // Load saved theme preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  // Save theme preference
+  useEffect(() => {
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Fetch countries data from API
   const fetchCountries = async () => {
@@ -51,7 +76,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="app">
+      <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
         <LoadingSpinner currentLanguage={currentLanguage} />
       </div>
     );
@@ -59,7 +84,7 @@ function App() {
 
   if (error) {
     return (
-      <div className="app">
+      <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
         <ErrorMessage
           error={error}
           currentLanguage={currentLanguage}
@@ -70,13 +95,24 @@ function App() {
   }
 
   return (
-    <div className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"}`}>
+    <div
+      className={`app ${currentLanguage === "fa" ? "rtl" : "ltr"} ${
+        isDarkMode ? "dark-mode" : "light-mode"
+      }`}
+    >
       <header className="app-header">
         <h1>{translations.countryInfo[currentLanguage]}</h1>
-        <LanguageSelector
-          currentLanguage={currentLanguage}
-          onLanguageChange={setCurrentLanguage}
-        />
+        <div className="header-controls">
+          <ThemeToggle
+            isDarkMode={isDarkMode}
+            onToggle={toggleTheme}
+            currentLanguage={currentLanguage}
+          />
+          <LanguageSelector
+            currentLanguage={currentLanguage}
+            onLanguageChange={setCurrentLanguage}
+          />
+        </div>
       </header>
 
       <main className="app-main">
