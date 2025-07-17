@@ -14,11 +14,15 @@ export const countryService = {
     }
 
     try {
+      console.log("Fetching countries from API...");
       const response = await fetch(
-        `${API_BASE_URL}/all?fields=name,capital,population,area,currencies,languages,flags,flag,cca2,cca3,region,subregion`
+        `${API_BASE_URL}/all?fields=name,capital,population,area,currencies,languages,flags,cca2,cca3,region,subregion`
       );
+      
+      console.log("API Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch countries");
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -29,6 +33,23 @@ export const countryService = {
       return processedData;
     } catch (error) {
       console.error("Error fetching countries:", error);
+      console.error("Error details:", error.message);
+      
+      // Fallback: try without fields parameter
+      try {
+        console.log("Trying fallback API call without fields...");
+        const fallbackResponse = await fetch(`${API_BASE_URL}/all`);
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          console.log("Fallback API successful, processing data...");
+          const processedData = this.processCountriesData(fallbackData);
+          cache.set(cacheKey, processedData);
+          return processedData;
+        }
+      } catch (fallbackError) {
+        console.error("Fallback API also failed:", fallbackError);
+      }
+      
       throw error;
     }
   }, // Process API data to match our application format
